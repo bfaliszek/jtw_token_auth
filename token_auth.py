@@ -68,6 +68,16 @@ userList = import_data_from_csv_file()
 print("userList: {}".format(userList))
 
 
+# Set a callback function to return a custom response whenever an expired
+# token attempts to access a protected route. This particular callback function
+# takes the jwt_header and jwt_payload as arguments, and must return a Flask
+# response. Check the API documentation to see the required argument and return
+# values for other callback functions.
+@jwt.expired_token_loader
+def my_expired_token_callback():
+    return jsonify(msg="Your token is expired"), 401
+
+
 # Create a route to authenticate your users and return JWTs. The
 # create_access_token() function is used to actually generate the JWT.
 @app.route("/get_token", methods=["POST"])  # do it every 45 minutes
@@ -87,7 +97,6 @@ def get_api_token():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
     if username not in userList or password != api_password:
-        # log username, password and IP!!
         save_api_logs('login failed', username, password, request.remote_addr)
         return jsonify({"msg": "Bad username or password"}), 401
 
@@ -100,7 +109,6 @@ def get_db_token():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
     if username not in userList or password != db_password:
-        # log username, password and IP!!
         save_db_logs('login failed', username, password, request.remote_addr)
         return jsonify({"msg": "Bad username or password"}), 401
 
