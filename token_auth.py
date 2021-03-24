@@ -75,7 +75,7 @@ print("userList: {}".format(userList))
 # values for other callback functions.
 @jwt.expired_token_loader
 def my_expired_token_callback():
-    return jsonify(msg="Your token is expired"), 401
+    return jsonify({"msg": "Your token is expired"}), 401
 
 
 # Create a route to authenticate your users and return JWTs. The
